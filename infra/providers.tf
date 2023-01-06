@@ -10,8 +10,3 @@ terraform {
 provider "aws" {
     region = "eu-west-3"
 }
-
-resource "aws_s3_bucket" "landing_bucket" {
-    bucket = "sotnich-learn-mltest"
-    force_destroy = true
-}

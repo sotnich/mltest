@@ -1,0 +1,17 @@
+project: mltest
+registry:
+    path: s3://${FEAST_S3_BUCKET}/feast/registry.db
+    cache_ttl_seconds: 60
+provider: aws
+online_store:
+    type: dynamodb
+    region: ${FEAST_REGION}
+offline_store:
+    type: redshift
+    cluster_id: ${FEAST_REDSHIFT_CLUSTER}
+    region: ${FEAST_REGION}
+    database: dev
+    user: admin
+    s3_staging_location: s3://${FEAST_S3_BUCKET}/feast/staging
+    iam_role: ${FEAST_IAM_ROLE_ARN}
+entity_key_serialization_version: 2

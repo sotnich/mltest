@@ -1,0 +1,11 @@
+[Unit]
+Description=Feast ui service
+
+[Service]
+WorkingDirectory=/root/
+ExecStart=/usr/local/bin/feast ui -p 8080
+Restart=always
+EnvironmentFile=/root/feast-environment
+
+[Install]
+WantedBy=multi-user.target
