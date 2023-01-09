@@ -48,6 +48,7 @@ resource "aws_instance" "feast-ui-instance" {
     depends_on              = [aws_s3_bucket.bucket]
     user_data = <<EOF
 #!/bin/bash
+set -e
 export FEAST_S3_BUCKET="${aws_s3_bucket.bucket.bucket}"
 export FEAST_IAM_ROLE_ARN="${aws_iam_role.for_redshift.arn}"
 export FEAST_REDSHIFT_CLUSTER="${aws_redshift_cluster.feast_redshift_cluster.cluster_identifier}"
@@ -65,5 +66,7 @@ cd /root/
 /usr/local/bin/feast apply
 systemctl start feastui
 systemctl enable feastui
+CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S")
+/usr/local/bin/feast materialize-incremental "$CURRENT_TIME"
 EOF
 }

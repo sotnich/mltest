@@ -44,7 +44,7 @@ credit_history_source = RedshiftSource(
 credit_history = FeatureView(
     name="credit_history",
     entities=[dob_ssn],
-    ttl=timedelta(days=90),
+    ttl=timedelta(days=3650),
     schema=[
         Field(name="credit_card_due", dtype=feast.types.Int64),
         Field(name="mortgage_due", dtype=feast.types.Int64),
