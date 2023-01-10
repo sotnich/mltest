@@ -61,12 +61,24 @@ aws s3 cp s3://${aws_s3_bucket.bucket.bucket}/config/feast/feature_store.yaml /r
 aws s3 cp s3://${aws_s3_bucket.bucket.bucket}/config/feast/features.py /root/features.py
 aws s3 cp s3://${aws_s3_bucket.bucket.bucket}/config/feast/feastui.service /etc/systemd/system/feastui.service
 pip3 install --upgrade pip
-pip3 install feast[aws]
+pip3 install --default-timeout=100 feast[aws]
 cd /root/
 /usr/local/bin/feast apply
 systemctl start feastui
 systemctl enable feastui
-CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S")
-/usr/local/bin/feast materialize-incremental "$CURRENT_TIME"
 EOF
+}
+
+resource "null_resource" "clear_dynamo_caches" {
+    triggers = {
+        aws_region = var.aws_region
+    }
+
+    provisioner "local-exec" {
+        when    = destroy
+        command = <<EOF
+aws dynamodb delete-table --region ${self.triggers.aws_region} --table-name mltest.zipcode_features
+aws dynamodb delete-table --region ${self.triggers.aws_region} --table-name mltest.credit_history
+EOF
+    }
 }

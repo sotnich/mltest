@@ -9,7 +9,7 @@ aws s3 cp s3://${aws_s3_bucket.bucket.bucket}/data/loan_features/table.parquet /
 PACKAGE=feast[aws]
 ENVIRONMENT=python3
 conda activate "$ENVIRONMENT"
-pip install --upgrade "$PACKAGE"
+pip install --upgrade --default-timeout=100 "$PACKAGE"
 conda env config vars set FEAST_S3_BUCKET="${aws_s3_bucket.bucket.bucket}"
 conda env config vars set FEAST_IAM_ROLE_ARN="${aws_iam_role.for_redshift.arn}"
 conda env config vars set FEAST_REDSHIFT_CLUSTER="${aws_redshift_cluster.feast_redshift_cluster.cluster_identifier}"
@@ -47,6 +47,17 @@ resource "aws_iam_role_policy_attachment" "for_notebooks_s3_full" {
     policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
     role       = aws_iam_role.for_notebooks.name
 }
+
+resource "aws_iam_role_policy_attachment" "for_notebooks_dynamo_full" {
+    policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+    role       = aws_iam_role.for_notebooks.name
+}
+
+resource "aws_iam_role_policy_attachment" "for_notebooks_redshift_full" {
+    policy_arn = "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess"
+    role       = aws_iam_role.for_notebooks.name
+}
+
 
 resource "aws_sagemaker_code_repository" "repo" {
     code_repository_name = var.project_name
