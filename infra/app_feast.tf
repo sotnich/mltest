@@ -1,5 +1,5 @@
 resource "aws_iam_role" "feast_for_ec2" {
-    name = "${var.project_name}_feast_ec2"
+    name               = "${var.project_name}_feast_ec2"
     assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -18,7 +18,7 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "feast_for_ec2_s3full_attachment" {
     role       = aws_iam_role.feast_for_ec2.name
-    policy_arn = aws_iam_policy.s3full.arn
+    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "feast_for_ec2_redshiftfull_attachment" {
@@ -37,15 +37,14 @@ resource "aws_iam_instance_profile" "feast_for_ec2_profile" {
 }
 
 resource "aws_instance" "feast-ui-instance" {
-	ami                     = "ami-0cc814d99c59f3789"
-	instance_type           = "t2.micro"
-	key_name                = "my_work_id_rsa"
-    iam_instance_profile    = aws_iam_instance_profile.feast_for_ec2_profile.name
-    tags = {
+    ami                    = "ami-0cc814d99c59f3789"
+    instance_type          = "t2.micro"
+    vpc_security_group_ids = [aws_security_group.default.id]
+    iam_instance_profile   = aws_iam_instance_profile.feast_for_ec2_profile.name
+    depends_on             = [aws_s3_bucket.bucket]
+    tags                   = {
         Name = "feast-ui"
-        project = var.project_name
     }
-    depends_on              = [aws_s3_bucket.bucket]
     user_data = <<EOF
 #!/bin/bash
 set -e
@@ -81,4 +80,9 @@ aws dynamodb delete-table --region ${self.triggers.aws_region} --table-name mlte
 aws dynamodb delete-table --region ${self.triggers.aws_region} --table-name mltest.credit_history
 EOF
     }
+}
+
+output "feast_ui_address" {
+    description = "Feast-UI"
+    value       = "http://${aws_instance.feast-ui-instance.public_dns}:8080"
 }

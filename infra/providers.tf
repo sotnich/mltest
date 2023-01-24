@@ -4,9 +4,21 @@ terraform {
             source  = "hashicorp/aws"
             version = "~> 4.0"
         }
+
+#        redshift = {
+#            source = "brainly/redshift"
+#        }
     }
 }
 
 provider "aws" {
-    region = "eu-west-3"
+    region = var.aws_region
+    profile = "gdc"
+    default_tags {
+        tags = {
+            Environment = "learning"
+            Owner       = "serg"
+            Project     = "mlops-review"
+        }
+    }
 }

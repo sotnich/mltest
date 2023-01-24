@@ -21,6 +21,12 @@ resource "aws_s3_object" "loan_features_file_upload" {
     source = "../data/loan_table.parquet"
 }
 
+resource "aws_s3_object" "loan_train_file_upload" {
+    bucket = aws_s3_bucket.bucket.bucket
+    key    = "data/train/loan_table_training.parquet"
+    source = "../data/loan_table_training.parquet"
+}
+
 resource "aws_s3_object" "feast_feature_store_file_upload" {
     bucket = aws_s3_bucket.bucket.bucket
     key    = "config/feast/feature_store.yaml"

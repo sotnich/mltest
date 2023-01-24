@@ -1,5 +1,5 @@
 resource "aws_iam_role" "for_redshift" {
-    name = "${var.project_name}-for-redshift"
+    name               = "${var.project_name}-for-redshift"
     assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -43,17 +43,22 @@ resource "aws_iam_role_policy_attachment" "redshift_data_full" {
 
 resource "aws_iam_role_policy_attachment" "s3-policy-attachment" {
     role       = aws_iam_role.for_redshift.name
-    policy_arn = aws_iam_policy.s3full.arn
+    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
-data "aws_iam_role" "AWSServiceRoleForRedshift" {
-    name = "AWSServiceRoleForRedshift"
-}
+#resource "aws_iam_role_policy_attachment" "for_redshift_service_r_attach" {
+#    role       = aws_iam_role.for_redshift.name
+#    policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AmazonRedshiftServiceLinkedRolePolicy"
+#}
+
+#data "aws_iam_role" "AWSServiceRoleForRedshift" {
+#    name = "AWSServiceRoleForRedshift"
+#}
 
 resource "aws_redshift_cluster" "feast_redshift_cluster" {
     cluster_identifier = var.project_name
-    iam_roles = [
-        data.aws_iam_role.AWSServiceRoleForRedshift.arn,
+    iam_roles          = [
+        #        data.aws_iam_role.AWSServiceRoleForRedshift.arn,
         aws_iam_role.for_redshift.arn
     ]
     database_name   = var.redshift_database_name
@@ -67,7 +72,7 @@ resource "aws_redshift_cluster" "feast_redshift_cluster" {
 
     provisioner "local-exec" {
         command = <<EOF
-            aws redshift-data execute-statement \
+            aws --profile gdc redshift-data execute-statement \
                 --region ${var.aws_region} \
                 --cluster-identifier ${var.project_name} \
                 --db-user ${var.redshift_admin_user} \
@@ -78,3 +83,26 @@ resource "aws_redshift_cluster" "feast_redshift_cluster" {
         EOF
     }
 }
+
+#provider "redshift" {
+#    host     = aws_redshift_cluster.feast_redshift_cluster.dns_name
+#    username = var.redshift_admin_user
+#      temporary_credentials {
+#        cluster_identifier = var.project_name
+#        assume_role {
+#            arn = aws_iam_role.for_redshift.arn
+#        }
+#      }
+#}
+
+#resource "redshift_schema" "external_from_glue_data_catalog" {
+#    name  = "spectrum_schema"
+#    owner = aws_iam_role.for_redshift.arn
+#    external_schema {
+#        database_name = "spectrum"
+#        data_catalog_source {
+#            iam_role_arns = [aws_iam_role.for_redshift.arn]
+#            create_external_database_if_not_exists = true # Optional. Defaults to false.
+#        }
+#    }
+#}

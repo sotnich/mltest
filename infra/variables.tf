@@ -1,8 +1,3 @@
-variable "aws_account" {
-    type = string
-    default = "434051143318"
-}
-
 variable "aws_region" {
     type = string
     default = "eu-west-3"
@@ -10,8 +5,17 @@ variable "aws_region" {
 
 variable "project_name" {
     type        = string
-    default     = "s-mltest"
+    default     = "s-mltest2"
     description = "The project identifier is used to uniquely namespace resources"
+}
+
+data "aws_caller_identity" "current" {}
+#variable "aws_account" {
+#    type = string
+#    default = data.aws_caller_identity.current.account_id
+#}
+locals {
+    account_id = data.aws_caller_identity.current.account_id
 }
 
 variable "redshift_database_name" {
