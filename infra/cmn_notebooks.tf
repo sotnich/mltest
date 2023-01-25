@@ -4,8 +4,6 @@ resource "aws_sagemaker_notebook_instance_lifecycle_configuration" "lc" {
 #!/bin/bash
 set -e
 sudo -u ec2-user -i <<'EOF'
-aws s3 cp s3://${aws_s3_bucket.bucket.bucket}/config/feast/feature_store.yaml /home/ec2-user/feature_store.yaml
-aws s3 cp s3://${aws_s3_bucket.bucket.bucket}/data/loan_features/table.parquet /home/ec2-user/loan_table.parquet
 ENVIRONMENT=python3
 conda activate "$ENVIRONMENT"
 pip install --upgrade feast[aws]
@@ -92,4 +90,15 @@ resource "aws_sagemaker_notebook_instance" "ni" {
 output "notebooks_address" {
     description = "Notebooks-URL"
     value       = "${aws_sagemaker_notebook_instance.ni.url}/tree/mltest"
+}
+
+output "vars_to_run_locally" {
+    value = <<VARS
+Please set these variables in your local notebook (if you want to run local notebooks)
+export FEAST_S3_BUCKET="s-mltest2"
+export FEAST_IAM_ROLE_ARN="arn:aws:iam::834092605248:role/s-mltest2-for-redshift"
+export FEAST_REDSHIFT_CLUSTER="s-mltest2"
+export FEAST_REGION="eu-west-3"
+export YATAI_HOST="a64acbaff7bb1491d88bc34071c375c1-663950777.eu-west-3.elb.amazonaws.com"
+VARS
 }
