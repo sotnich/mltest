@@ -9,15 +9,6 @@ variable "project_name" {
     description = "The project identifier is used to uniquely namespace resources"
 }
 
-data "aws_caller_identity" "current" {}
-#variable "aws_account" {
-#    type = string
-#    default = data.aws_caller_identity.current.account_id
-#}
-locals {
-    account_id = data.aws_caller_identity.current.account_id
-}
-
 variable "redshift_database_name" {
     type        = string
     default     = "dev"

@@ -84,25 +84,3 @@ resource "aws_redshift_cluster" "feast_redshift_cluster" {
     }
 }
 
-#provider "redshift" {
-#    host     = aws_redshift_cluster.feast_redshift_cluster.dns_name
-#    username = var.redshift_admin_user
-#      temporary_credentials {
-#        cluster_identifier = var.project_name
-#        assume_role {
-#            arn = aws_iam_role.for_redshift.arn
-#        }
-#      }
-#}
-
-#resource "redshift_schema" "external_from_glue_data_catalog" {
-#    name  = "spectrum_schema"
-#    owner = aws_iam_role.for_redshift.arn
-#    external_schema {
-#        database_name = "spectrum"
-#        data_catalog_source {
-#            iam_role_arns = [aws_iam_role.for_redshift.arn]
-#            create_external_database_if_not_exists = true # Optional. Defaults to false.
-#        }
-#    }
-#}

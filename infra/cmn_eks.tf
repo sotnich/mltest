@@ -25,7 +25,7 @@ module "eks" {
 
             min_size     = 1
             max_size     = 6
-            desired_size = 4
+            desired_size = 2
         }
     }
 }
